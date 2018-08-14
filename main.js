@@ -1,10 +1,11 @@
 var http = require('http');
 var cheerio = require('cheerio');
-
+var fs = require('fs');
+var request = require('request');
 var mulu=[]
 var curJuan = 1;
 var totalJuan=0;
-
+var curComic="0";
 function parseHtml(html) {
     //写法和jQuery一模一样，有没有觉得很cool
     var reg = new RegExp("\<script(.*?)\>(.*?)\<\/script\>", "i");
@@ -16,9 +17,19 @@ function parseHtml(html) {
         if (reg1.test(ss)) {
             let img = (RegExp.$1);
             var ims = img.split('|');
-            ims.forEach((value, index) => {
-                console.log('http://98.94201314.net/dm01' + value);
-            })
+            fs.mkdir(curComic+'_'+curJuan);
+            for (let i = 0; i < ims.length; i++) {
+                let sss='http://98.94201314.net/dm01' + ims[i];
+                console.log(sss);
+                request.head(sss,function(err,res,body){
+                    if(err){
+                        console.log(err);
+                    }
+                });
+                let msss=sss.split('/');
+                var img_filename = msss[msss.length-1];
+                request(sss).pipe(fs.createWriteStream(curComic+'_'+curJuan +'/'+ img_filename));
+            }
         }
     }
     if (curJuan > totalJuan) {
@@ -60,8 +71,9 @@ function parseMulu(s) {
     loadCurPage()
 }
 
-function readMulu(url) {
-    http.get(url, function (res) {
+function readMulu(url,comic) {
+    curComic=comic;
+    http.get(url+comic, function (res) {
         var html = '';
         res.on('data', function (data) {
             html += data;
@@ -72,6 +84,6 @@ function readMulu(url) {
         });
     });
 }
-
 // readMulu('http://99.hhxxee.com/comic/9933524/');
-readMulu('http://99.hhxxee.com/comic/9915454/');
+
+readMulu('http://99.hhxxee.com/comic/','9915454/');
