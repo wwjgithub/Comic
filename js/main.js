@@ -1,7 +1,5 @@
 var http = require('http');
 var cheerio = require('cheerio');
-var fs = require('fs');
-var request = require('request');
 var mulu=[]
 var curJuan = 1;
 var totalJuan=0;
@@ -11,24 +9,14 @@ function parseHtml(html) {
     var reg = new RegExp("\<script(.*?)\>(.*?)\<\/script\>", "i");
 
     if (reg.test(html)) {
-        // console.log(RegExp.$2)
         const ss = RegExp.$2
         var reg1 = new RegExp(".*?\"(.*?)\".*$", "i");
         if (reg1.test(ss)) {
             let img = (RegExp.$1);
             var ims = img.split('|');
-            fs.mkdir(curComic+'_'+curJuan);
             for (let i = 0; i < ims.length; i++) {
                 let sss='http://98.94201314.net/dm01' + ims[i];
                 console.log(sss);
-                request.head(sss,function(err,res,body){
-                    if(err){
-                        console.log(err);
-                    }
-                });
-                let msss=sss.split('/');
-                var img_filename = msss[msss.length-1];
-                request(sss).pipe(fs.createWriteStream(curComic+'_'+curJuan +'/'+ img_filename));
             }
         }
     }
@@ -36,7 +24,6 @@ function parseHtml(html) {
         return;
     }
     curJuan++;
-    // setTimeout(loadCurPage,500);
     loadCurPage();
 }
 
@@ -86,4 +73,6 @@ function readMulu(url,comic) {
 }
 // readMulu('http://99.hhxxee.com/comic/9933524/');
 
-readMulu('http://99.hhxxee.com/comic/','9915454/');
+// readMulu('http://99.hhxxee.com/comic/','9915454/');
+// readMulu('http://99.hhxxee.com/comic/','9934058/');
+readMulu('http://99.hhxxee.com/comic/','9935267/');
