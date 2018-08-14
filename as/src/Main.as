@@ -17,6 +17,7 @@ import flash.geom.Rectangle;
 import flash.net.URLLoader;
 import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
+import flash.net.URLStream;
 import flash.system.JPEGLoaderContext;
 import flash.text.TextField;
 import flash.utils.ByteArray;
@@ -27,9 +28,9 @@ public class Main extends Sprite {
     private var l:URLLoader;
     private var ss:Array;
     private var cur:int;
+    private var juanNum:int=1;
     private var curImg:String;
-    private var ll:Loader;
-    private var bmps:Array = [];
+    private var ll:URLStream=new URLStream();
     private var juanName:String;
 
     public function Main() {
@@ -52,51 +53,34 @@ public class Main extends Sprite {
 
     private function loadImg():void {
         trace("load", this.curImg);
-        ll = new Loader();
-        ll.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadImgComplete);
+        ll.addEventListener(Event.COMPLETE, onLoadImgComplete);
         ll.load(new URLRequest(this.curImg));
     }
 
     private function onLoadImgComplete(event:Event):void {
-        this.bmps.push(Bitmap(ll.content).bitmapData);
+        var ba:ByteArray = new ByteArray();
+        ll.readBytes(ba);
+        save(this.juanName+"/"+juanNum, ba);
+
         if (cur + 1 >= ss.length) {
-            mergeImg();
             return;
         }
         var next:String = ss[cur + 1];
         var ns:Array = next.split("/");
         var jj:String = ns[ns.length - 2];
         if (jj != this.juanName) {
-            mergeImg();
             cur++;
+            juanNum=1;
             this.curImg = this.ss[cur];
             var ns11:Array = curImg.split("/");
             this.juanName = ns11[ns11.length - 2];
-            this.bmps = [];
             loadImg();
             return;
         }
         cur++;
+        juanNum++;
+        this.curImg = this.ss[cur];
         loadImg();
-    }
-
-    private function mergeImg():void {
-        trace("merge", this.bmps.length)
-        var h = 0;
-        var w = bmps[0].width;
-        for (var i:int = 0; i < bmps.length; i++) {
-            var bmp:BitmapData = bmps[i];
-            h += bmp.height;
-        }
-        var bmd = new BitmapData(w, h);
-        var hh = 0;
-        for (var j:int = 0; j < bmps.length; j++) {
-            var bmp1:BitmapData = bmps[j];
-            bmd.copyPixels(bmp1, new Rectangle(0, 0, bmp1.width, bmp1.height), new Point(0, hh));
-            hh += bmp1.height;
-        }
-
-        savePng(bmd, new Rectangle(0, 0, bmd.width, bmd.height));
     }
 
     private function save(size:String, png:ByteArray):void {
@@ -109,10 +93,5 @@ public class Main extends Sprite {
         png.clear();
     }
 
-    private function savePng(bmd:BitmapData, rect:Rectangle):void {
-//        var png:ByteArray=PNGEncoder.encode(bmd)
-        var png:ByteArray=new JPEGEncoder().encode(bmd)
-        save(this.juanName, png);
-    }
 }
 }
