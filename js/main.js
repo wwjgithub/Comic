@@ -1,4 +1,4 @@
-var http = require('http');
+﻿var http = require('http');
 var cheerio = require('cheerio');
 var mulu=[]
 var curJuan = 1;
@@ -73,3 +73,6 @@ function readMulu(url,comic) {
 }
 //秋色之空舊版
 readMulu('http://99.hhxxee.com/comic/','998492/');
+//9933213
+//9934058
+//998525
