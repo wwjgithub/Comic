@@ -23,7 +23,7 @@ package {
             l = new URLLoader();
             l.dataFormat = URLLoaderDataFormat.TEXT;
             l.addEventListener(Event.COMPLETE, onLoad);
-            l.load(new URLRequest("偷窥.txt"));
+            l.load(new URLRequest("秋色之空.txt"));
         }
 
         private function onLoad(event:Event):void {

@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         String m = "h-mate";
         File file = new File("" + m);
-        System.out.println(file.getAbsolutePath());
+        //System.out.println(file.getAbsolutePath());
         File[] fs = file.listFiles();
         for (int i = 0; i < fs.length; i++) {
             File f = fs[i];
@@ -20,10 +20,15 @@ public class Main {
 
             for (int j = 0; j < mmm.size(); j++) {
                 File img = mmm.get(j);
-                System.out.println(img.getAbsolutePath());
+//                System.out.println(img.getAbsolutePath());
                 fs1.add(img.getAbsolutePath());
             }
-            mergeImage(fs1,2,(i+1)+".png");
+            ArrayList<ArrayList<BufferedImage>> fsss = getFiles(fs1);
+            for (int j = 0; j < fsss.size(); j++) {
+
+                mergeImage(fsss.get(j), 2, (i + 1) + "_" + (j + 1) + ".jpg");
+
+            }
         }
     }
 
@@ -41,7 +46,7 @@ public class Main {
                     return -1;
                 if (o1.isFile() && o2.isDirectory())
                     return 1;
-                return Integer.valueOf(o1.getName().split("\\.")[0])<Integer.valueOf(o2.getName().split("\\.")[0])?-1:1;
+                return Integer.valueOf(o1.getName().split("\\.")[0]) < Integer.valueOf(o2.getName().split("\\.")[0]) ? -1 : 1;
             }
         });
         for (int i = 0; i < fileList.size(); i++) {
@@ -51,21 +56,15 @@ public class Main {
         return fileList;
     }
 
-    public static void mergeImage(Vector<String> files, int type, String targetFile) {
+    public static void mergeImage(ArrayList<BufferedImage> files, int type, String targetFile) {
         int len = files.size();
         if (len < 1) {
             throw new RuntimeException("图片数量小于1");
         }
-        File[] src = new File[len];
         BufferedImage[] images = new BufferedImage[len];
         int[][] ImageArrays = new int[len][];
         for (int i = 0; i < len; i++) {
-            try {
-                src[i] = new File(files.get(i));
-                images[i] = ImageIO.read(src[i]);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            images[i] = (files.get(i));
             int width = images[i].getWidth();
             int height = images[i].getHeight();
             ImageArrays[i] = new int[width * height];
@@ -79,7 +78,6 @@ public class Main {
                 newHeight = newHeight > images[i].getHeight() ? newHeight : images[i].getHeight();
                 newWidth += images[i].getWidth();
             } else if (type == 2) {// 纵向
-
                 newWidth = newWidth > images[i].getWidth() ? newWidth : images[i].getWidth();
                 newHeight += images[i].getHeight();
             }
@@ -108,9 +106,37 @@ public class Main {
             }
             //输出想要的图片
             ImageIO.write(ImageNew, targetFile.split("\\.")[1], new File(targetFile));
+            System.out.println(new File(targetFile).getAbsolutePath());
 
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    private static ArrayList<ArrayList<BufferedImage>> getFiles(Vector<String> files) {
+
+        ArrayList<ArrayList<BufferedImage>> ret = new ArrayList<>();
+        ArrayList<BufferedImage> cur = new ArrayList<>();
+        BufferedImage img1;
+        int totalHeight = 0;
+        for (int i = 0; i < files.size(); i++) {
+            try {
+                File img = new File(files.get(i));
+                img1 = ImageIO.read(img);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            if(img1==null){
+                continue;
+            }
+            totalHeight += img1.getHeight();
+            cur.add(img1);
+            if (totalHeight > 20000) {
+                ret.add(cur);
+                cur = new ArrayList<>();
+                totalHeight = 0;
+            }
+        }
+        return ret;
     }
 }

@@ -71,8 +71,5 @@ function readMulu(url,comic) {
         });
     });
 }
-// readMulu('http://99.hhxxee.com/comic/9933524/');
-
-// readMulu('http://99.hhxxee.com/comic/','9915454/');
-// readMulu('http://99.hhxxee.com/comic/','9934058/');
-readMulu('http://99.hhxxee.com/comic/','9935267/');
+//秋色之空舊版
+readMulu('http://99.hhxxee.com/comic/','998492/');
